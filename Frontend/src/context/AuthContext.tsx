@@ -1,19 +1,39 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 
-const AuthContext = createContext<any>(null);
+interface AuthContextType {
+  user: any | null;
+  login: (token: string) => void;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } }).then((res) => setUser(res.data));
+      api.get('/auth/me').then((res) => setUser(res.data)).catch(() => setUser(null));
     }
   }, []);
 
-  return <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>;
+  const login = (token: string) => {
+    localStorage.setItem('token', token);
+    setUser({}); // Actualiza el estado del usuario
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth debe usarse dentro de un AuthProvider');
+  return context;
+};
