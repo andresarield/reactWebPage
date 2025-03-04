@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/UserModel';
+import User from '../models/User';
 
 // Middleware para verificar el token
 export const authMiddleware = async (req: any, res: Response, next: NextFunction) => {
