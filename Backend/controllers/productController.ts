@@ -1,4 +1,4 @@
-import Product from '../models/ProductModel';
+import Product from '../models/Product';
 import { Request, Response } from 'express';
 
 // Obtener todos los productos

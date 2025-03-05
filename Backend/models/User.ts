@@ -1,6 +1,22 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
-const userSchema = new mongoose.Schema({
+// Interfaz para el modelo User
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+  role: string; // 'user' o 'admin'
+  googleId?: string; // Opcional
+  facebookId?: string; // Opcional
+  wishlist: mongoose.Types.ObjectId[]; // Referencia a productos
+  cart: Array<{
+    product: mongoose.Types.ObjectId; // Referencia a un producto
+    quantity: number;
+  }>;
+}
+
+// Esquema de Mongoose
+const userSchema = new mongoose.Schema<IUser>({
   name: String,
   email: { type: String, unique: true },
   password: String,
@@ -16,4 +32,5 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-export default mongoose.model('User', userSchema);
+// Exportar el modelo
+export default mongoose.model<IUser>('User', userSchema);
