@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 
 export const getCart = async (req: Request, res: Response) => {
   try {
-    const user = await User.findById(req.user._id).populate('cart.product');
+    const user = await User.findById(req.user?._id).populate('cart.product');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -16,12 +16,12 @@ export const getCart = async (req: Request, res: Response) => {
 export const addToCart = async (req: Request, res: Response) => {
   try {
     const { productId } = req.body;
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user?._id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const existingItem = user.cart.find((item: any) => item.product.toString() === productId);
+    const existingItem = user.cart.find((item) => item.product.toString() === productId);
     if (existingItem) {
       existingItem.quantity = (existingItem.quantity || 0) + 1;
     } else {
@@ -38,14 +38,13 @@ export const addToCart = async (req: Request, res: Response) => {
 export const removeFromCart = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user?._id);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Filtrar el carrito para eliminar el producto
-    user.cart = user.cart.filter((item: any) => item.product.toString() !== productId);
+    user.cart = user.cart.filter((item) => item.product.toString() !== productId);
 
     await user.save();
     res.json(user.cart);
@@ -56,12 +55,11 @@ export const removeFromCart = async (req: Request, res: Response) => {
 
 export const clearCart = async (req: Request, res: Response) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user?._id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Limpiar el carrito
     user.cart = [];
     await user.save();
     res.json(user.cart);
